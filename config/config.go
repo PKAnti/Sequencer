@@ -9,10 +9,10 @@ import (
 )
 
 type BotConfig struct {
-	Discord DiscordConfig           `toml:"Discord"`
-	Spotify SpotifyConfig           `toml:"Spotify"`
-	Youtube YoutubeConfig           `toml:"Youtube"`
-	Db      database.DatabaseConfig `toml:"Database"`
+	Discord DiscordConfig     `toml:"Discord"`
+	Spotify SpotifyConfig     `toml:"Spotify"`
+	Youtube YoutubeConfig     `toml:"Youtube"`
+	Db      database.DBConfig `toml:"Database"`
 }
 
 type DiscordConfig struct {
@@ -27,20 +27,20 @@ type YoutubeConfig struct {
 	Token string `toml:"API-Token"`
 }
 
-func GenerateConfig(path string) {
+func LoadAndRefreshConfig(path string) BotConfig {
 	outFile, err := filepath.Abs(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	replaceConfig := BotConfig{}
+	loadedConfig := BotConfig{}
 	if _, err := os.Stat(outFile); err == nil {
 		f, err := os.Open(outFile)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		err = toml.NewDecoder(f).Decode(&replaceConfig)
+		err = toml.NewDecoder(f).Decode(&loadedConfig)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -57,7 +57,7 @@ func GenerateConfig(path string) {
 	}
 
 	outConfig := toml.NewEncoder(f).PromoteAnonymous(true)
-	err = outConfig.Encode(replaceConfig)
+	err = outConfig.Encode(loadedConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,18 +66,6 @@ func GenerateConfig(path string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
 
-func LoadConfig(path string) BotConfig {
-	config, err := toml.LoadFile(path)
-	if err != nil {
-		log.Fatal("Error reading config! Generate a basic config with \"" + os.Args[0] + " --generate" + "\nError: " + err.Error())
-	}
-
-	read_config := BotConfig{}
-	err = config.Unmarshal(&read_config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return read_config
+	return loadedConfig
 }
