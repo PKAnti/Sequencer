@@ -2,16 +2,17 @@ package config
 
 import (
 	"github.com/pelletier/go-toml"
+	"github.com/pkanti/v2/database"
 	"log"
 	"os"
 	"path/filepath"
 )
 
 type BotConfig struct {
-	Discord DiscordConfig  `toml:"Discord"`
-	Spotify SpotifyConfig  `toml:"Spotify"`
-	Youtube YoutubeConfig  `toml:"Youtube"`
-	Db      DatabaseConfig `toml:"Database"`
+	Discord DiscordConfig           `toml:"Discord"`
+	Spotify SpotifyConfig           `toml:"Spotify"`
+	Youtube YoutubeConfig           `toml:"Youtube"`
+	Db      database.DatabaseConfig `toml:"Database"`
 }
 
 type DiscordConfig struct {
@@ -26,17 +27,28 @@ type YoutubeConfig struct {
 	Token string `toml:"API-Token"`
 }
 
-type DatabaseConfig struct {
-	Uri string `toml:"URI"`
-}
-
-func GenerateConfig(path string, overwrite bool) {
+func GenerateConfig(path string) {
 	outFile, err := filepath.Abs(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if _, err := os.Stat(outFile); err == nil && overwrite == false {
-		log.Fatal("Config file to generate already exists.")
+
+	replaceConfig := BotConfig{}
+	if _, err := os.Stat(outFile); err == nil {
+		f, err := os.Open(outFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = toml.NewDecoder(f).Decode(&replaceConfig)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	f, err := os.Create(outFile)
@@ -44,10 +56,8 @@ func GenerateConfig(path string, overwrite bool) {
 		log.Fatal(err)
 	}
 
-	sampleConfig := BotConfig{}
-
 	outConfig := toml.NewEncoder(f).PromoteAnonymous(true)
-	err = outConfig.Encode(sampleConfig)
+	err = outConfig.Encode(replaceConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
