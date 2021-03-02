@@ -4,38 +4,39 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pkanti/v2/config"
+	"log"
 )
 
-type DBConfig struct {
-	Hostname string `toml:"Hostname"`
-	Port     int    `toml:"Port"`
-	Database string `toml:"Database"`
-	Username string `toml:"Username"`
-	Password string `toml:"Password"`
-}
-
-func (data *DBConfig) GetURI() string {
+func getURI(data config.DatabaseConfig) string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
 		data.Username, data.Password, data.Hostname, data.Port, data.Database)
 }
 
-func (data *DBConfig) ValidateNonnull() bool {
+func ValidateNonnull(data config.DatabaseConfig) bool {
 	return data.Username != "" &&
 		data.Hostname != "" &&
 		data.Port > 0 &&
 		data.Database != ""
 }
 
-func ConnectDatabase(config DBConfig) (*sql.DB, error) {
-	db, err := sql.Open("mysql", config.GetURI())
-	if err != nil {
-		return nil, err
+var Database *sql.DB
+
+func init() {
+	if !ValidateNonnull(config.Config.Db) {
+		log.Fatal("Invalid database configuration")
 	}
 
-	err = db.Ping()
+	var err error
+	Database, err = sql.Open("mysql", getURI(config.Config.Db))
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	return db, nil
+	err = Database.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Database connected")
 }
