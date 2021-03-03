@@ -16,7 +16,7 @@ type BotConfig struct {
 }
 
 type DiscordConfig struct {
-	Token string `toml:"Secret"`
+	Token string `toml:"Client-Secret"`
 }
 
 type SpotifyConfig struct {
@@ -24,7 +24,7 @@ type SpotifyConfig struct {
 }
 
 type YoutubeConfig struct {
-	Token string `toml:"API-Token"`
+	APIKey string `toml:"API-Key"`
 }
 
 type DatabaseConfig struct {
@@ -36,7 +36,11 @@ type DatabaseConfig struct {
 }
 
 var configPath = flag.String("config", "config.toml", ".toml config file path. If missing, the config will be generated.")
-var Config BotConfig = loadConfig()
+var Config = loadConfig()
+
+func init() {
+	flag.Parse()
+}
 
 func loadConfig() BotConfig {
 
