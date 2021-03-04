@@ -16,6 +16,7 @@ func main() {
 
 	if *runTests {
 		tests.TestFindSongYoutube("The Killers", "When You Were Young")
+		tests.TestSpotifyGeneral()
 		return
 	}
 
