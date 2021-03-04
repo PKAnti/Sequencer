@@ -20,7 +20,8 @@ type DiscordConfig struct {
 }
 
 type SpotifyConfig struct {
-	Token string `toml:"API-Token"`
+	ID    string `toml:"Client-ID"`
+	Token string `toml:"Client-Secret"`
 }
 
 type YoutubeConfig struct {
