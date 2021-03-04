@@ -16,7 +16,7 @@ func init() {
 	Service, err = youtube.NewService(ctx,
 		option.WithScopes(
 			youtube.YoutubeReadonlyScope),
-		option.WithAPIKey(config.Config.Youtube.APIKey))
+		option.WithAPIKey(config.Config.Youtube.Token))
 	if err != nil {
 		log.Fatal(err)
 	}

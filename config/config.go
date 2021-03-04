@@ -24,7 +24,7 @@ type SpotifyConfig struct {
 }
 
 type YoutubeConfig struct {
-	APIKey string `toml:"API-Key"`
+	Token string `toml:"API-Key"`
 }
 
 type DatabaseConfig struct {
