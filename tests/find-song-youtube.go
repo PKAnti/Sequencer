@@ -60,8 +60,9 @@ func TestFindSongYoutube(artist, title string) {
 		fmt.Printf("[%v] %v\n", item.Id.VideoId, item.Snippet.Title)
 		id := item.Id.VideoId
 		snippet := item.Snippet
+		effectiveTitle := strings.Replace(snippet.Title, "&amp; ", "&", -1)
 		strTime, _ := time.Parse(time.RFC3339, snippet.PublishedAt)
-		if strings.ToLower(snippet.Title) == strings.ToLower(title) &&
+		if strings.ToLower(effectiveTitle) == strings.ToLower(title) &&
 			strTime.Before(EarliestPublish) {
 			VideoID = id
 			VideoSnippet = snippet
@@ -72,8 +73,9 @@ func TestFindSongYoutube(artist, title string) {
 	if VideoSnippet == nil {
 		fmt.Println("No suitable video found")
 	} else {
+		effectiveTitle := strings.Replace(VideoSnippet.Title, "&amp; ", "&", -1)
 		fmt.Println("Found: http://www.youtube.com/watch?v=" + VideoID)
 		fmt.Println("Channel: " + VideoSnippet.ChannelTitle)
-		fmt.Println("Title: " + VideoSnippet.Title)
+		fmt.Println("Title: " + effectiveTitle)
 	}
 }
