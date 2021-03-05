@@ -37,6 +37,7 @@ type DatabaseConfig struct {
 }
 
 var configPath = flag.String("config", "config.toml", ".toml config file path. If missing, the config will be generated.")
+var RunTests = flag.Bool("run-tests", false, "Run tests")
 var Config = loadConfig()
 
 func init() {
