@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"github.com/pkanti/v2/core"
 	djspotify "github.com/pkanti/v2/spotify"
 	"github.com/zmb3/spotify"
 	"log"
@@ -13,41 +14,25 @@ func TestSpotifyGeneral() {
 	title := "When You Were Young"
 	fmt.Println("Searching Spotify with title=\"" + title + "\" artist=\"" + artist + "\"")
 
-	result, err := djspotify.Client.Search(artist+" "+title, spotify.SearchTypeTrack)
-	if err != nil {
-		log.Fatal(err)
+	localData := core.TrackMetadata{
+		Artist: []string{artist},
+		Title:  title,
+		Album:  "",
 	}
 
-	var match *spotify.FullTrack
-	match = nil
-	for _, page := range result.Tracks.Tracks {
-		searchArtistMatch := false
-		for _, searchArtist := range page.Artists {
-			if strings.ToLower(searchArtist.Name) == strings.ToLower(artist) {
-				searchArtistMatch = true
-				break
-			}
-		}
-		if searchArtistMatch {
-			if strings.ToLower(page.Name) == strings.ToLower(title) {
-				match = &page
-				break
-			}
-		}
-	}
-
-	if match == nil {
+	spotifyURL, metadata, err := djspotify.SearchTrackFromMetadata(&localData)
+	if err == nil {
 		fmt.Println("No qualified match!")
 	} else {
-		fmt.Print("Found: " + match.Name + " by ")
-		for idx, artist := range match.Artists {
+		fmt.Print("Found: " + metadata.Name + " by ")
+		for idx, artist := range metadata.Artists {
 			fmt.Print(artist.Name)
-			if idx < len(match.Artists)-1 {
+			if idx < len(metadata.Artists)-1 {
 				fmt.Print(", ")
 			}
 		}
 
-		fmt.Printf(" https://open.spotify.com/album/%v?highlight=%v\n", match.Album.ID.String(), match.URI)
+		fmt.Println(" " + spotifyURL)
 	}
 
 	playlistURL := "https://open.spotify.com/playlist/7GRdKkdbUprchkrf0hVqqX?si=cKUs9sn2QJ6X3NUiD1S33g"

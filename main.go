@@ -17,6 +17,7 @@ func main() {
 		tests.TestFindSongYoutube("Sir Sly", "&Run")
 		tests.TestGetMetadataYoutube()
 		tests.TestSpotifyGeneral()
+		tests.YoutubeToSpotify("https://music.youtube.com/watch?v=2Vu0WhZOvAQ&feature=share")
 		return
 	}
 
